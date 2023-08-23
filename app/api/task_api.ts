@@ -1,8 +1,8 @@
 import queryString from 'query-string';
 import { mainURL } from '../config';
 import { IPayloadLogin } from '../types/auth';
-import { IResponse } from '../types/common';
-import { IFilters, IPayloadTask, ITask, ITaskInfo } from '../types/tasks';
+import { IDataList, IResponse } from '../types/common';
+import { IFiltersTask, IPayloadTask, ITask, ITaskInfo } from '../types/tasks';
 import { createClient } from './axios_client';
 
 const client = createClient(mainURL);
@@ -22,9 +22,9 @@ export const taskApi = {
   deleteTask: (taskId: number) => {
     return client.delete(`/tasks/${taskId}`);
   },
-  getTaskList: (filters: IFilters) => {
+  getTaskList: (filters: IFiltersTask) => {
     const params = queryString.stringify(filters);
-    return client.get(`/tasks?${params}`);
+    return client.get<IDataList<ITask>>(`/tasks?${params}`);
   },
   getTaskById: (taskId: number) => {
     return client.get<ITaskInfo>(`/tasks/${taskId}`);

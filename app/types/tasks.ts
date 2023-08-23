@@ -1,4 +1,4 @@
-import { IStatus } from './common';
+import { IFilters, IStatus } from './common';
 import { ITaskType } from './taskType';
 
 export interface ITask {
@@ -8,14 +8,6 @@ export interface ITask {
   completeDate: Date;
   totalSubTasks: number;
   taskTypeName: string;
-}
-
-export interface ITaskList {
-  page: number;
-  totalData: number;
-  totalPage: number;
-  totalCurrentData: number;
-  data: ITask[];
 }
 
 export interface ITaskInfo extends ITime {
@@ -45,12 +37,7 @@ export interface IPayloadTask {
   dueDate?: Date;
 }
 
-export interface IFilters {
-  page: number;
-  size: number;
-  sortBy: string;
-  sortDir: 'desc' | 'asc';
-  querySearch: string;
+export interface IFiltersTask extends IFilters {
   typeId: 'ALL' | number;
   filters: IStatus;
 }

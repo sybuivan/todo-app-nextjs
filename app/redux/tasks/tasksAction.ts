@@ -2,15 +2,10 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { taskApi } from '../../api/task_api';
 import { initFilters } from '../../constants/default';
 import { IPayloadLogin } from '../../types/auth';
-import { IResponse } from '../../types/common';
-import {
-  IFilters,
-  IPayloadTask,
-  ITaskInfo,
-  ITaskList,
-} from '../../types/tasks';
+import { IDataList, IResponse } from '../../types/common';
+import { IFiltersTask, IPayloadTask, ITask, ITaskInfo } from '../../types/tasks';
 
-export const getTaskList = createAsyncThunk<ITaskList, IFilters>(
+export const getTaskList = createAsyncThunk<IDataList<ITask>, IFiltersTask>(
   'tasks/getTaskList',
   async (filters, { rejectWithValue }) => {
     try {

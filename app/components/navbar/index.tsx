@@ -1,9 +1,10 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Nav() {
+  const [isOpen, setIsOpen] = useState<boolean>();
   return (
     <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
       <div className="px-3 py-3 lg:px-5 lg:pl-3">
@@ -42,68 +43,49 @@ export default function Nav() {
               </span>
             </Link>
           </div>
-          {/* <div className="flex items-center">
-          <div className="flex items-center ml-3">
-            <div>
+          <div className="relative ml-3">
+            <div onClick={() => setIsOpen(!isOpen)}>
               <button
                 type="button"
-                className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                aria-expanded="false"
-                data-dropdown-toggle="dropdown-user"
+                className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                id="user-menu-button"
               >
+                <span className="absolute -inset-1.5"></span>
                 <span className="sr-only">Open user menu</span>
+                <img
+                  className="h-8 w-8 rounded-full"
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt=""
+                />
               </button>
             </div>
-            <div
-              className="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600"
-              id="dropdown-user"
-            >
-              <div className="px-4 py-3" role="none">
-                <p
-                  className="text-sm text-gray-900 dark:text-white"
-                  role="none"
+
+            {isOpen && (
+              <div
+                className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                role="menu"
+              >
+                <Link
+                  href="/profile"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
-                  Neil Sims
-                </p>
-                <p
-                  className="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
-                  role="none"
+                  Your Profile
+                </Link>
+                <Link
+                  href="/settings"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
-                  neil.sims@flowbite.com
-                </p>
+                  Settings
+                </Link>
+                <Link
+                  href="#"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Sign out
+                </Link>
               </div>
-              <ul className="py-1" role="none">
-                <li>
-                  <Link
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                    role="menuitem"
-                  >
-                    Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                    role="menuitem"
-                  >
-                    Upcoming
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                    role="menuitem"
-                  >
-                    Today
-                  </Link>
-                </li>
-              </ul>
-            </div>
+            )}
           </div>
-        </div> */}
         </div>
       </div>
     </nav>

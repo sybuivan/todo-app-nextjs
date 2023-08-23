@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { initFilters } from '../../constants/default';
 import { getLocalStorage } from '../../constants/localstorage';
-import { IFilters, ITask, ITaskList } from '../../types/tasks';
+import { IDataList } from '../../types/common';
+import { IFiltersTask, ITask } from '../../types/tasks';
 import {
   completeTask,
   createTask,
@@ -11,8 +12,8 @@ import {
 } from './tasksAction';
 
 interface ITaskSlice {
-  listData: ITaskList;
-  payloadFilters: IFilters;
+  listData: IDataList<ITask>;
+  payloadFilters: IFiltersTask;
 }
 
 const initialState: ITaskSlice = {
@@ -23,7 +24,11 @@ const initialState: ITaskSlice = {
     totalData: 0,
     totalPage: 0,
   },
-  payloadFilters: initFilters,
+  payloadFilters: {
+    ...initFilters,
+    filters: 'ALL',
+    typeId: 'ALL',
+  },
 };
 
 const taskSlice = createSlice({

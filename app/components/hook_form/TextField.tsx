@@ -10,6 +10,7 @@ interface IProps {
   handleChange?: (name: string, value: any) => void;
   placeholder?: string;
   classes?: string;
+  disabled?: boolean;
 }
 
 export const FormInput: React.FC<IProps> = ({
@@ -18,6 +19,7 @@ export const FormInput: React.FC<IProps> = ({
   label,
   type = 'text',
   required = false,
+  disabled = false,
   handleChange,
   placeholder,
   classes = 'bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500',
@@ -34,13 +36,14 @@ export const FormInput: React.FC<IProps> = ({
       control={control}
       render={({ field, fieldState: { error, invalid } }) => (
         <div className="w-full">
-          <label>
+          <label className="my-2 block">
             {label}
             {required && <span>*</span>}
           </label>
           <input
-            className={classes}
+            className={`${classes} ${invalid && 'border border-red-500'}`}
             type={type}
+            disabled={disabled}
             placeholder={placeholder}
             {...field}
             onChange={(e) => {
@@ -51,7 +54,9 @@ export const FormInput: React.FC<IProps> = ({
               }
             }}
           />
-          {invalid && <p className="text-red-500">{error?.message}</p>}
+          {invalid && (
+            <p className="text-red-500 text-sm py-1">{error?.message}</p>
+          )}
         </div>
       )}
     />

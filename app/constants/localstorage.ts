@@ -13,6 +13,9 @@ export const getLocalStorage = (key: string) => {
 };
 
 export const getRoles = () => {
-  const roles: TRole[] = JSON.parse(localStorage.getItem('roles')) || [];
-  return roles;
+  if (typeof window !== 'undefined') {
+    const roles: TRole[] = JSON.parse(localStorage.getItem('roles')) || [];
+    return roles;
+  }
+  return [];
 };
