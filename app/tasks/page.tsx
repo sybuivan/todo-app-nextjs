@@ -6,9 +6,11 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import AddFieldButton from '../components/add_field_button';
 import { FormInput } from '../components/hook_form/TextField';
+import Loading from '../components/loading';
 import Pagination from '../components/pagination';
 import Search from '../components/search';
 import { useDelayTimeout } from '../hooks/useDelayTimeout';
+import { useIsRequestPending } from '../hooks/useStatus';
 import { useAppDispatch, useAppSelector } from '../redux';
 import {
   createTask,
@@ -17,7 +19,7 @@ import {
 } from '../redux/tasks/tasksAction';
 import { changeFilters } from '../redux/tasks/taskSlice';
 import { IOption, IStatus } from '../types/common';
-import { IFilters, ITaskInfo } from '../types/tasks';
+import { IFiltersTask, ITaskInfo } from '../types/tasks';
 import TaskDetail from './components/TaskDetail';
 import TaskItem from './components/TaskItem';
 
@@ -30,6 +32,7 @@ const Today = () => {
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const delay = useDelayTimeout();
+  const isLoading = useIsRequestPending('tasks', 'getTaskList');
 
   const {
     listData: { data, totalCurrentData, totalPage, totalData },
@@ -52,6 +55,7 @@ const Today = () => {
   const handleSelected = (taskId: number) => {
     setTaskIdSelected(taskId);
   };
+
   const { control, handleSubmit, reset, setFocus } = useForm({
     defaultValues: {
       name: '',
@@ -70,41 +74,21 @@ const Today = () => {
     });
   };
 
-  const handleChangeFilter = (value: IStatus) => {
-    const newFilters: IFilters = {
+  const handleChangeFilter = (name: string, value: any) => {
+    const newFilters: IFiltersTask = {
       ...payloadFilters,
-      filters: value,
+      [name]: value,
     };
-    dispatch(changeFilters(newFilters));
-  };
-
-  const handleChangeFilterSort = (sort: 'asc' | 'desc') => {
-    const newFilters: IFilters = {
-      ...payloadFilters,
-      sortDir: sort,
-    };
-    dispatch(changeFilters(newFilters));
-  };
-
-  const handleOnChangeSearch = (search: string) => {
-    const newFilters: IFilters = {
-      ...payloadFilters,
-      querySearch: search,
-    };
-    delay(() => {
-      dispatch(changeFilters(newFilters));
-    });
-  };
-  const handleOnChangeType = (typeId: any) => {
-    const newFilters: IFilters = {
-      ...payloadFilters,
-      typeId,
-    };
+    if (name === 'querySearch') {
+      return delay(() => {
+        dispatch(changeFilters(newFilters));
+      });
+    }
     dispatch(changeFilters(newFilters));
   };
 
   const handleOnChangePage = (page: number) => {
-    const newFilters: IFilters = {
+    const newFilters: IFiltersTask = {
       ...payloadFilters,
       page,
     };
@@ -126,6 +110,8 @@ const Today = () => {
     if (token) dispatch(getTaskList(payloadFilters));
   }, [payloadFilters]);
 
+  if (isLoading) return <Loading />;
+
   if (!token) return router.push('/login');
   if (!roles.includes('ROLE_USER')) return router.push('/');
 
@@ -134,7 +120,7 @@ const Today = () => {
       <div className={taskIdSelected ? 'shrink grow-[8]' : 'shrink grow-[12]'}>
         <div className="flex justify-between items-center mb-3">
           <h3 className="font-bold text-lg mb-3">Tasks - ({totalData})</h3>
-          <Search onChange={handleOnChangeSearch} />
+          <Search onChange={handleChangeFilter} name="querySearch" />
         </div>
         <div className="mb-6">
           <div className="flex gap-2 items-center">
@@ -147,7 +133,7 @@ const Today = () => {
                     : ''
                 }
             rounded-lg hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-blue-300`}
-                onClick={() => handleChangeFilter('ALL')}
+                onClick={() => handleChangeFilter('filters', 'ALL')}
               >
                 All
               </button>
@@ -157,7 +143,7 @@ const Today = () => {
                     ? 'bg-blue-500 text-white'
                     : ''
                 } rounded-lg hover:bg-blue-500 hover:text-white focus:outline-none`}
-                onClick={() => handleChangeFilter('COMPLETED')}
+                onClick={() => handleChangeFilter('filters', 'COMPLETED')}
               >
                 Completed
               </button>
@@ -167,7 +153,7 @@ const Today = () => {
                     ? 'bg-blue-500 text-white'
                     : ''
                 } rounded-lg hover:bg-blue-500 hover:text-white focus:outline-none`}
-                onClick={() => handleChangeFilter('INCOMPLETE')}
+                onClick={() => handleChangeFilter('filters', 'INCOMPLETE')}
               >
                 Incomplete
               </button>
@@ -178,7 +164,7 @@ const Today = () => {
             <select
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               value={payloadFilters.typeId}
-              onChange={(e) => handleOnChangeType(e.target.value)}
+              onChange={(e) => handleChangeFilter('typeId', e.target.value)}
             >
               <option value="" disabled>
                 Select an option
@@ -201,7 +187,7 @@ const Today = () => {
                   ? 'bg-blue-500 text-white'
                   : ''
               } rounded-lg hover:bg-blue-500 hover:text-white focus:outline-none`}
-              onClick={() => handleChangeFilterSort('desc')}
+              onClick={() => handleChangeFilter('sortDir', 'desc')}
             >
               Descending
             </button>
@@ -210,7 +196,7 @@ const Today = () => {
                 payloadFilters.sortDir === 'asc' ? 'bg-blue-500 text-white' : ''
               }
             rounded-lg hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-blue-300`}
-              onClick={() => handleChangeFilterSort('asc')}
+              onClick={() => handleChangeFilter('sortDir', 'asc')}
             >
               Ascending
             </button>

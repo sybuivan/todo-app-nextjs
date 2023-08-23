@@ -7,10 +7,11 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import ButtonLoading from '../components/button_loading';
 import { FormInput } from '../components/hook_form/TextField';
-import { useGetStatus } from '../hooks/useStatus';
+import { useGetStatus, useIsRequestSuccess } from '../hooks/useStatus';
 import { useAppDispatch, useAppSelector } from '../redux';
 import { forgotPassword } from '../redux/auth/authAction';
 import { toastMessage } from '../utils/toast';
+import SendSuccess from './components/send_success';
 
 const schemaForgotPassword = yup.object().shape({
   email: yup.string().email('Email invalid').required('Email not empty.'),
@@ -18,6 +19,7 @@ const schemaForgotPassword = yup.object().shape({
 
 const ForgotPassword = () => {
   const [isLoading] = useGetStatus('auth', 'forgotPassword');
+  const isSuccess = useIsRequestSuccess('auth', 'forgotPassword');
   const router = useRouter();
   const { token } = useAppSelector((state) => state.authSlice);
   const dispatch = useAppDispatch();
@@ -38,6 +40,7 @@ const ForgotPassword = () => {
   };
 
   if (token) return router.push('/');
+  if (isSuccess) return <SendSuccess />;
 
   return (
     <section className="">
@@ -72,7 +75,7 @@ const ForgotPassword = () => {
               </div>
 
               {isLoading ? (
-                <ButtonLoading title="Sing in" />
+                <ButtonLoading title="Send email" />
               ) : (
                 <button
                   type="submit"

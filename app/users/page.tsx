@@ -31,8 +31,8 @@ const Users = () => {
               <tr className="bg-blue-600 text-left text-xs font-semibold uppercase tracking-widest text-white">
                 <th className="px-5 py-3">ID</th>
                 <th className="px-5 py-3">Full Name</th>
-                <th className="px-5 py-3">User Role</th>
-                <th className="px-5 py-3">Created at</th>
+                <th className="px-5 py-3">Username</th>
+                <th className="px-5 py-3">Email</th>
                 <th className="px-5 py-3">Status</th>
               </tr>
             </thead>

@@ -1,16 +1,18 @@
 'use client';
-import './globals.css';
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Inter } from 'next/font/google';
-import ProvidersWrapper from './ProvidersWrapper';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 import Nav from '../app/components/navbar';
 import Sidebar from '../app/components/sidebar';
-import { useEffect } from 'react';
+import Loading from './components/loading';
+import './globals.css';
+import { useGetStatus } from './hooks/useStatus';
+import ProvidersWrapper from './ProvidersWrapper';
 import { useAppDispatch, useAppSelector } from './redux';
 import { getTaskType } from './redux/taskType/taskTypeAction';
-import { Toaster } from 'react-hot-toast';
+import { getMe } from './redux/user/userAction';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -37,15 +39,15 @@ export default function RootLayout({
 }
 
 export const LayoutContent = ({ children }: { children: React.ReactNode }) => {
-  const router = useRouter();
   const { token } = useAppSelector((state) => state.authSlice);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (token) {
       dispatch(getTaskType());
+      dispatch(getMe());
     }
-  }, [token]);
+  }, []);
 
   return (
     <div>

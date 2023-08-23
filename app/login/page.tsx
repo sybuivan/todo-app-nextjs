@@ -10,7 +10,8 @@ import { FormInput } from '../components/hook_form/TextField';
 import { useGetStatus } from '../hooks/useStatus';
 import { useAppDispatch, useAppSelector } from '../redux';
 import { loginUser } from '../redux/auth/authAction';
-import { setInformation } from '../redux/user/userSlice';
+import { getTaskType } from '../redux/taskType/taskTypeAction';
+import { getMe } from '../redux/user/userAction';
 import { IPayloadLogin } from '../types/auth';
 import { toastMessage } from '../utils/toast';
 
@@ -39,13 +40,8 @@ const LoginForm = () => {
       .unwrap()
       .then((payload) => {
         toastMessage.success('Login successfully');
-        const { email, firstName } = payload.data;
-        dispatch(
-          setInformation({
-            firstName,
-            email,
-          })
-        );
+        dispatch(getTaskType());
+        dispatch(getMe());
         router.push('/');
       });
   };
@@ -76,22 +72,22 @@ const LoginForm = () => {
               onSubmit={handleSubmit(handleOnSubmit)}
             >
               <div>
-                <label
-                  htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Your email
-                </label>
-                <FormInput name="email" type="text" control={control} />
+                <FormInput
+                  name="email"
+                  type="text"
+                  control={control}
+                  placeholder="Enter your email"
+                  label="Email"
+                />
               </div>
               <div>
-                <label
-                  htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                >
-                  Password
-                </label>
-                <FormInput name="password" type="text" control={control} />
+                <FormInput
+                  name="password"
+                  type="password"
+                  control={control}
+                  placeholder="********"
+                  label="Password"
+                />
               </div>
               <div className="flex items-center justify-end">
                 <Link

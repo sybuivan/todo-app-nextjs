@@ -11,4 +11,7 @@ export const userApi = {
   changePassword: (payload: IPayloadChangePassword) => {
     return client.put('/users/change-password', payload);
   },
+  getMe: () => {
+    return client.get('/users/get-me');
+  },
 };

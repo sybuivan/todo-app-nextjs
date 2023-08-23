@@ -1,13 +1,17 @@
 'use client';
-import Image from 'next/image';
-import React from 'react';
-import * as yup from 'yup';
-import { useForm } from 'react-hook-form';
-import { FormInput } from '../components/hook_form/TextField';
-import BoxInfo from './components/box_info';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { IUser } from '../types/user';
-import { useAppSelector } from '../redux';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+import ButtonLoading from '../components/button_loading';
+import { FormInput } from '../components/hook_form/TextField';
+import Loading from '../components/loading';
+import { useGetStatus, useIsRequestPending } from '../hooks/useStatus';
+import { useAppDispatch, useAppSelector } from '../redux';
+import { changePassword, updateUserInfo } from '../redux/user/userAction';
+import { IPayloadChangePassword, IUser } from '../types/user';
+import { toastMessage } from '../utils/toast';
+import BoxInfo from './components/box_info';
 
 const schemaInformation = yup.object().shape({
   email: yup.string().email('Email invalid').required('Email not empty.'),
@@ -17,26 +21,63 @@ const schemaInformation = yup.object().shape({
 });
 
 const schemaPassword = yup.object().shape({
-  oldPassword: yup.string().email('Email invalid').required('Email not empty.'),
-  newPassword: yup.string().required('Username not empty'),
-  confirmPassword: yup.string().required('FirstName not empty'),
+  oldPassword: yup
+    .string()
+    .required('Current passsword not empty.')
+    .min(8, 'Current password must be at least 8 characters'),
+  newPassword: yup
+    .string()
+    .required('Username not empty')
+    .min(8, 'Confirm password must be at least 8 characters'),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('newPassword'), null], 'Passwords must match')
+    .required('Confirm password not empty')
+    .min(8, 'Confirm password must be at least 8 characters'),
 });
 
 const Profile = () => {
+  const dispatch = useAppDispatch();
+  const [isLoading] = useGetStatus('user', 'getMe');
+  const isLoadingUpdate = useIsRequestPending('user', 'updateUserInfo');
+  const isLoadingChange = useIsRequestPending('user', 'changePassword');
+
   const { user } = useAppSelector((state) => state.userSlice);
-  const { control, handleSubmit: handleSubmitInfo } = useForm<IUser>({
+  const {
+    control,
+    handleSubmit: handleSubmitInfo,
+    reset,
+  } = useForm<IUser>({
     defaultValues: user,
     resolver: yupResolver(schemaInformation),
   });
 
-  const { control: controlPassword, handleSubmit: handleSubmitPassword } =
-    useForm({
-      defaultValues: {},
+  const { control: controlPassword, handleSubmit } =
+    useForm<IPayloadChangePassword>({
+      defaultValues: { confirmPassword: '', newPassword: '', oldPassword: '' },
       resolver: yupResolver(schemaPassword),
     });
 
-  const handleOnSubmitInfo = () => {};
-  const handleOnSubmitPassword = () => {};
+  const handleOnSubmitInfo = (payload: IUser) => {
+    dispatch(updateUserInfo(payload))
+      .unwrap()
+      .then(() => {
+        toastMessage.success('Update user successfully');
+      });
+  };
+  const handleOnSubmitPassword = async (payload: IPayloadChangePassword) => {
+    dispatch(changePassword(payload))
+      .unwrap()
+      .then(() => {
+        toastMessage.success('Change password successfully');
+      });
+  };
+  useEffect(() => {
+    reset({ ...user });
+  }, [isLoading]);
+
+  if (isLoading) return <Loading />;
+
   return (
     <div className="bg-[#f9fafb]">
       <h2 className="font-bold py-4 text-xl pl-8">User profile</h2>
@@ -60,7 +101,7 @@ const Profile = () => {
         </div>
         <div className="flex-[0.7]">
           <form onSubmit={handleSubmitInfo(handleOnSubmitInfo)}>
-            <BoxInfo title="General information" name="Save info">
+            <BoxInfo title="General information">
               <div className="flex flex-wrap gap-4 mb-3">
                 <div className="w-[45%]">
                   <FormInput
@@ -96,40 +137,68 @@ const Profile = () => {
                   />
                 </div>
               </div>
+              <div>
+                <button
+                  disabled={isLoadingUpdate}
+                  type="submit"
+                  className={`text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300
+                font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700
+                focus:outline-none dark:focus:ring-blue-800 ${
+                  isLoadingUpdate && 'bg-gray-200'
+                }`}
+                >
+                  Save info
+                </button>
+              </div>
             </BoxInfo>
           </form>
 
-          <BoxInfo title="Password information" name="Save password">
-            <div
-              className="flex flex-wrap gap-4 mb-3"
-              onSubmit={handleSubmitPassword(handleOnSubmitPassword)}
-            >
-              <div className="w-[45%]">
-                <FormInput
-                  control={control}
-                  name="oldPassword"
-                  placeholder="********"
-                  label="Current password"
-                />
+          <form onSubmit={handleSubmit(handleOnSubmitPassword)}>
+            <BoxInfo title="Password information">
+              <div className="flex flex-wrap gap-4 mb-3">
+                <div className="w-[45%]">
+                  <FormInput
+                    control={controlPassword}
+                    name="oldPassword"
+                    placeholder="********"
+                    label="Current password"
+                    type="password"
+                  />
+                </div>
+                <div className="w-[45%]">
+                  <FormInput
+                    control={controlPassword}
+                    name="newPassword"
+                    placeholder="********"
+                    label="New password"
+                    type="password"
+                  />
+                </div>
+                <div className="w-[45%]">
+                  <FormInput
+                    control={controlPassword}
+                    name="confirmPassword"
+                    placeholder="********"
+                    label="Confirm password"
+                    type="password"
+                  />
+                </div>
               </div>
-              <div className="w-[45%]">
-                <FormInput
-                  control={control}
-                  name="newPassword"
-                  placeholder="********"
-                  label="New password"
-                />
+              <div>
+                <button
+                  disabled={isLoadingChange}
+                  type="submit"
+                  className={`text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300
+                font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700
+                focus:outline-none dark:focus:ring-blue-800 ${
+                  isLoadingChange && 'bg-gray-200'
+                }`}
+                >
+                  Change password
+                </button>
               </div>
-              <div className="w-[45%]">
-                <FormInput
-                  control={control}
-                  name="confirmPassword"
-                  placeholder="********"
-                  label="Confirm password"
-                />
-              </div>
-            </div>
-          </BoxInfo>
+            </BoxInfo>
+          </form>
         </div>
       </div>
     </div>

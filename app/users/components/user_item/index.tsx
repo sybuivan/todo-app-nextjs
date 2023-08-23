@@ -25,10 +25,10 @@ const UserItem = ({ user, index }: { user: IUserInfor; index: number }) => {
         </div>
       </td>
       <td className="border-b border-gray-200 bg-white px-5 py-5 text-sm">
-        <p className="whitespace-no-wrap">Administrator</p>
+        <p className="whitespace-no-wrap">{username}</p>
       </td>
       <td className="border-b border-gray-200 bg-white px-5 py-5 text-sm">
-        <p className="whitespace-no-wrap">Sep 28, 2022</p>
+        <p className="whitespace-no-wrap">{email}</p>
       </td>
 
       <td className="border-b border-gray-200 bg-white px-5 py-5 text-sm">

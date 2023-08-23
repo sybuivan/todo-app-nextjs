@@ -1,6 +1,12 @@
 import React from 'react';
 
-const Search = ({ onChange }: { onChange: (search: string) => void }) => {
+const Search = ({
+  onChange,
+  name,
+}: {
+  onChange: (name: string, search: string) => void;
+  name: string;
+}) => {
   return (
     <form>
       <div className="relative">
@@ -32,7 +38,7 @@ const Search = ({ onChange }: { onChange: (search: string) => void }) => {
           placeholder="Enter a task name"
           required
           onChange={(e: any) => {
-            onChange(e.target.value);
+            onChange(name, e.target.value);
           }}
         />
       </div>
